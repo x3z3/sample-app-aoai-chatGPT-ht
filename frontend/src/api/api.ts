@@ -1,6 +1,6 @@
 import { chatHistorySampleData } from '../constants/chatHistory'
 
-import { ChatMessage, Conversation, ConversationRequest, CosmosDBHealth, CosmosDBStatus, UserInfo } from './models'
+import { ChatMessage, Conversation, ConversationRequest, CosmosDBHealth, CosmosDBStatus, UserInfo, FeedbackSubmission } from './models'
 
 export async function conversationApi(options: ConversationRequest, abortSignal: AbortSignal): Promise<Response> {
   const response = await fetch('/conversation', {
@@ -15,6 +15,32 @@ export async function conversationApi(options: ConversationRequest, abortSignal:
   })
 
   return response
+}
+
+export async function submitConversationFeedback(feedback: FeedbackSubmission, conversationData: ChatMessage[]): Promise<Response> {
+  try {
+    const feedbackResponse = await fetch('/conversation/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        conversation: conversationData,
+        isPositive: feedback.isPositive,
+        additionalInfo: feedback.additionalInfo
+      })
+    });
+
+    if (!feedbackResponse.ok) {
+      console.error('Failed to submit feedback:', await feedbackResponse.text());
+      throw new Error('Failed to submit feedback');
+    }
+
+    return feedbackResponse;
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    throw error;  // Rethrow to allow caller to handle
+  }
 }
 
 export async function getUserInfo(): Promise<UserInfo[]> {

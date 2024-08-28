@@ -1,5 +1,10 @@
 import Plotly from 'react-plotly.js'
 
+export interface FeedbackSubmission {
+  isPositive: boolean;
+  additionalInfo: string;
+}
+
 export type AskResponse = {
   answer: string
   citations: Citation[]
@@ -137,7 +142,6 @@ export type UI = {
   logo?: string
   chat_logo?: string
   show_share_button?: boolean
-  show_chat_history_button?: boolean
 }
 
 export type FrontendSettings = {

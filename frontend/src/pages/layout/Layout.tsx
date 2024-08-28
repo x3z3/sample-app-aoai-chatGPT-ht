@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import { Dialog, Stack, TextField } from '@fluentui/react'
+import { Dialog, Stack, TextField, CommandBarButton } from '@fluentui/react'
 import { CopyRegular } from '@fluentui/react-icons'
 
 import { CosmosDBStatus } from '../../api'
-import Contoso from '../../assets/Contoso.svg'
+import Logo from '../../assets/HT.svg'
 import { HistoryButton, ShareButton } from '../../components/common/Button'
 import { AppStateContext } from '../../state/AppProvider'
 
@@ -17,7 +17,6 @@ const Layout = () => {
   const [shareLabel, setShareLabel] = useState<string | undefined>('Share')
   const [hideHistoryLabel, setHideHistoryLabel] = useState<string>('Hide chat history')
   const [showHistoryLabel, setShowHistoryLabel] = useState<string>('Show chat history')
-  const [logo, setLogo] = useState('')
   const appStateContext = useContext(AppStateContext)
   const ui = appStateContext?.state.frontendSettings?.ui
 
@@ -41,18 +40,12 @@ const Layout = () => {
   }
 
   useEffect(() => {
-    if (!appStateContext?.state.isLoading) {
-      setLogo(ui?.logo || Contoso)
-    }
-  }, [appStateContext?.state.isLoading])
-
-  useEffect(() => {
     if (copyClicked) {
       setCopyText('Copied URL')
     }
   }, [copyClicked])
 
-  useEffect(() => { }, [appStateContext?.state.isCosmosDBAvailable.status])
+  useEffect(() => {}, [appStateContext?.state.isCosmosDBAvailable.status])
 
   useEffect(() => {
     const handleResize = () => {
@@ -78,13 +71,19 @@ const Layout = () => {
       <header className={styles.header} role={'banner'}>
         <Stack horizontal verticalAlign="center" horizontalAlign="space-between">
           <Stack horizontal verticalAlign="center">
-            <img src={logo} className={styles.headerIcon} aria-hidden="true" alt="" />
+            <img src={ui?.logo ? ui.logo : Logo} className={styles.headerIcon} aria-hidden="true" alt="" />
             <Link to="/" className={styles.headerTitleContainer}>
               <h1 className={styles.headerTitle}>{ui?.title}</h1>
             </Link>
           </Stack>
           <Stack horizontal tokens={{ childrenGap: 4 }} className={styles.shareButtonContainer}>
-            {appStateContext?.state.isCosmosDBAvailable?.status !== CosmosDBStatus.NotConfigured && ui?.show_chat_history_button !== false && (
+            <CommandBarButton
+              className={styles.uploadButtonRoot} // Use the new class from the CSS
+              iconProps={{ iconName: 'Upload' }} // Ensure the icon is set correctly
+              text="Upload"
+              onClick={() => window.open('https://hypertherm.sharepoint.com', '_blank')}
+            />
+            {appStateContext?.state.isCosmosDBAvailable?.status !== CosmosDBStatus.NotConfigured && (
               <HistoryButton
                 onClick={handleHistoryClick}
                 text={appStateContext?.state?.isChatHistoryOpen ? hideHistoryLabel : showHistoryLabel}
